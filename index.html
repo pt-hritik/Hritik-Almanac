@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffd9e8">
+<title>a question for you 💌</title>
+
+<!-- Link preview (what she sees when you send the URL on WhatsApp) -->
+<meta property="og:title" content="i have a question for you 💌">
+<meta property="og:description" content="open this. it'll take 20 seconds.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   1. TOKENS
+   ═══════════════════════════════════════════════════════════ */
+:root{
+  --pink-50:#fff5f9;
+  --pink-100:#ffe4ef;
+  --pink-200:#ffc9de;
+  --pink-400:#ff7bac;
+  --pink-500:#ff4f96;
+  --purple-500:#a855f7;
+  --ink:#3d2b35;
+  --ink-soft:#7c6470;
+  --card:rgba(255,255,255,.82);
+  --card-line:rgba(255,255,255,.9);
+  --shadow:0 18px 50px -12px rgba(214,51,132,.28);
+  --radius:26px;
+  --grad:linear-gradient(135deg,var(--pink-500),var(--purple-500));
+  --tap:52px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html{-webkit-text-size-adjust:100%}
+
+body{
+  font-family:"Fredoka",ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(120% 80% at 15% 0%,   #fff0f6 0%, transparent 60%),
+    radial-gradient(110% 90% at 90% 100%, #ede4ff 0%, transparent 55%),
+    var(--pink-50);
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  overscroll-behavior:none;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2. LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+#stage{
+  position:relative;
+  z-index:2;
+  min-height:100vh;
+  min-height:100dvh;
+  display:grid;
+  place-items:center;
+  padding:
+    calc(20px + env(safe-area-inset-top))
+    18px
+    calc(24px + env(safe-area-inset-bottom));
+}
+
+.screen{
+  display:none;
+  width:100%;
+  max-width:440px;
+  background:var(--card);
+  border:1px solid var(--card-line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(14px) saturate(1.3);
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);
+  padding:34px 24px calc(30px + env(safe-area-inset-bottom));
+  text-align:center;
+}
+.screen.on{display:block;animation:rise .5s cubic-bezier(.2,.9,.3,1.1) both}
+
+@keyframes rise{
+  from{opacity:0;transform:translateY(22px) scale(.97)}
+  to  {opacity:1;transform:none}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   3. TYPE
+   ═══════════════════════════════════════════════════════════ */
+h1{
+  font-size:clamp(1.7rem,7.5vw,2.3rem);
+  font-weight:700;
+  line-height:1.18;
+  letter-spacing:-.015em;
+  text-wrap:balance;
+}
+.sub{
+  margin-top:12px;
+  font-size:1rem;
+  font-weight:400;
+  line-height:1.55;
+  color:var(--ink-soft);
+  text-wrap:pretty;
+}
+.eyebrow{
+  font-size:.78rem;
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--pink-400);
+  margin-bottom:14px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   4. BUTTONS
+   ═══════════════════════════════════════════════════════════ */
+button,input,select{font:inherit;color:inherit}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5em;
+  min-height:var(--tap);
+  padding:0 30px;
+  border:0;
+  border-radius:999px;
+  background:var(--grad);
+  color:#fff;
+  font-size:1.08rem;
+  font-weight:600;
+  cursor:pointer;
+  touch-action:manipulation;
+  box-shadow:0 10px 24px -8px rgba(255,79,150,.75);
+  transition:transform .18s cubic-bezier(.2,.9,.3,1.4), box-shadow .18s, opacity .2s;
+}
+.btn:active{transform:scale(.96)}
+.btn:disabled{opacity:.4;box-shadow:none;cursor:not-allowed}
+.btn:disabled:active{transform:none}
+
+.btn-ghost{
+  background:none;
+  color:var(--ink-soft);
+  box-shadow:none;
+  border:1.5px solid var(--pink-200);
+  font-weight:500;
+}
+
+.btn-wa{
+  width:100%;
+  background:linear-gradient(135deg,#25d366,#12a350);
+  box-shadow:0 10px 24px -8px rgba(18,163,80,.7);
+  font-size:1.05rem;
+}
+
+.row{
+  margin-top:30px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* the "no" button, once it breaks free */
+#no.loose{
+  position:fixed;
+  z-index:60;
+  margin:0;
+  /* The taunt labels are much longer than "no" — keep each on a single line
+     and let the pill grow to fit, or the text spills outside the border. */
+  white-space:nowrap;
+  padding:0 18px;
+  font-size:1rem;
+  max-width:calc(100vw - 20px);
+  transition:left .22s cubic-bezier(.2,.9,.3,1.2), top .22s cubic-bezier(.2,.9,.3,1.2), transform .18s;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   5. FORM BITS
+   ═══════════════════════════════════════════════════════════ */
+input[type="date"],
+input[type="text"]{
+  width:100%;
+  min-height:var(--tap);
+  padding:0 18px;
+  border:1.5px solid var(--pink-200);
+  border-radius:16px;
+  background:#fff;
+  font-size:1.05rem;
+  text-align:center;
+  touch-action:manipulation;
+}
+input[type="date"]{ -webkit-appearance:none; appearance:none }
+input:focus-visible{outline:2.5px solid var(--pink-400);outline-offset:2px;border-color:transparent}
+input::placeholder{color:#c4b2bb}
+
+.field{margin-top:26px}
+
+.options{
+  margin-top:24px;
+  display:grid;
+  gap:10px;
+  text-align:left;
+}
+.opt{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  min-height:var(--tap);
+  padding:12px 16px;
+  border:1.5px solid var(--pink-200);
+  border-radius:16px;
+  background:#fff;
+  font-size:1.02rem;
+  cursor:pointer;
+  touch-action:manipulation;
+  transition:border-color .18s, background .18s, transform .12s;
+}
+.opt:active{transform:scale(.985)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.dot{
+  flex:0 0 auto;
+  width:21px;height:21px;
+  border:2px solid var(--pink-200);
+  border-radius:50%;
+  display:grid;place-items:center;
+  transition:border-color .18s;
+}
+.dot::after{
+  content:"";
+  width:11px;height:11px;
+  border-radius:50%;
+  background:var(--grad);
+  transform:scale(0);
+  transition:transform .2s cubic-bezier(.2,.9,.3,1.6);
+}
+.opt.sel{border-color:var(--pink-400);background:var(--pink-50)}
+.opt.sel .dot{border-color:var(--pink-400)}
+.opt.sel .dot::after{transform:scale(1)}
+
+/* ═══════════════════════════════════════════════════════════
+   6. SUMMARY CARD
+   ═══════════════════════════════════════════════════════════ */
+.ticket{
+  margin-top:24px;
+  display:grid;
+  gap:2px;
+  padding:20px;
+  border-radius:18px;
+  background:linear-gradient(135deg,var(--pink-100),#f0e6ff);
+  border:1.5px dashed var(--pink-200);
+  text-align:left;
+}
+.ticket div{
+  display:flex;
+  gap:12px;
+  align-items:baseline;
+  padding:7px 0;
+  font-size:1.05rem;
+  font-weight:500;
+}
+.ticket span{
+  flex:0 0 76px;
+  font-size:.74rem;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+
+.hint{
+  margin-top:20px;
+  font-size:.9rem;
+  color:var(--ink-soft);
+  line-height:1.5;
+}
+.hint.ok{color:#12a350;font-weight:500}
+
+.spin{
+  display:inline-block;
+  width:13px;height:13px;
+  margin-right:8px;
+  vertical-align:-1px;
+  border:2px solid var(--pink-200);
+  border-top-color:var(--pink-500);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#rescue-text{
+  margin-top:14px;
+  padding:16px;
+  border-radius:16px;
+  background:#fff;
+  border:1.5px solid var(--pink-200);
+  font-family:inherit;
+  font-size:.98rem;
+  line-height:1.65;
+  text-align:left;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   7. AMBIENCE
+   ═══════════════════════════════════════════════════════════ */
+#confetti{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  pointer-events:none;
+}
+#hearts{
+  position:fixed;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  overflow:hidden;
+}
+#hearts i{
+  position:absolute;
+  bottom:-60px;
+  font-style:normal;
+  opacity:.55;
+  animation:drift linear infinite;
+  will-change:transform;
+}
+@keyframes drift{
+  from{transform:translateY(0) rotate(0deg)}
+  to  {transform:translateY(-118vh) rotate(360deg)}
+}
+
+.pulse{animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{
+  0%,100%{transform:scale(1)}
+  50%    {transform:scale(1.06)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  #hearts{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<div id="hearts" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<main id="stage">
+
+  <!-- ── 1. the ask ─────────────────────────────────── -->
+  <section class="screen on" id="s-ask">
+    <p class="eyebrow" id="ask-eyebrow">a small question</p>
+    <h1 id="ask-title">will you go out with me?</h1>
+    <p class="sub" id="ask-sub">no pressure. one of these buttons is just easier to press than the other.</p>
+    <div class="row">
+      <button class="btn" id="yes">yes 💛</button>
+      <button class="btn btn-ghost" id="no">no</button>
+    </div>
+  </section>
+
+  <!-- ── 2. celebration ─────────────────────────────── -->
+  <section class="screen" id="s-yay">
+    <h1 style="font-size:clamp(2.2rem,11vw,3.2rem)">yayyy!! 🎉</h1>
+    <p class="sub" id="yay-sub">okay okay okay. let's plan this properly.</p>
+    <div class="row">
+      <button class="btn pulse" id="to-date">let's plan it →</button>
+    </div>
+  </section>
+
+  <!-- ── 3. pick a date ─────────────────────────────── -->
+  <section class="screen" id="s-date">
+    <p class="eyebrow">step 1 of 2</p>
+    <h1>pick a date 📅</h1>
+    <p class="sub">choose the day for our little date plan.</p>
+    <div class="field">
+      <input type="date" id="date-in" aria-label="date of the date">
+    </div>
+    <div class="row">
+      <button class="btn" id="to-act" disabled>next →</button>
+    </div>
+  </section>
+
+  <!-- ── 4. what to do ──────────────────────────────── -->
+  <section class="screen" id="s-act">
+    <p class="eyebrow">step 2 of 2</p>
+    <h1>what would you like to do? ❤️</h1>
+    <p class="sub">pick whatever sounds nicest.</p>
+    <div class="options" id="opts" role="radiogroup" aria-label="activity"></div>
+    <div class="field">
+      <input type="text" id="note-in" maxlength="80" placeholder="anything else? (optional)">
+    </div>
+    <div class="row">
+      <button class="btn btn-ghost" id="back-date">← back</button>
+      <button class="btn" id="to-done" disabled>done →</button>
+    </div>
+  </section>
+
+  <!-- ── 5. summary + whatsapp ──────────────────────── -->
+  <section class="screen" id="s-done">
+    <p class="eyebrow">it's a date</p>
+    <h1 id="done-title">see you then 💛</h1>
+    <div class="ticket">
+      <div><span>when</span><b id="r-date">—</b></div>
+      <div><span>what</span><b id="r-act">—</b></div>
+      <div id="r-note-row" hidden><span>ps</span><b id="r-note">—</b></div>
+    </div>
+    <p class="hint" id="status"><span class="spin"></span>letting him know…</p>
+
+    <!-- Only shown if the network let us down. -->
+    <div id="rescue" hidden>
+      <p class="sub" style="margin-top:6px">your phone couldn't reach him just now — tap copy and send him this, takes two seconds 💛</p>
+      <pre id="rescue-text"></pre>
+      <div class="row" style="margin-top:14px">
+        <button class="btn" id="copy">copy it 📋</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ⚙️  CONFIG — this is the only part you need to edit
+   ═══════════════════════════════════════════════════════════ */
+const CONFIG = {
+
+  // Her name. Used in the opening line. Leave "" to skip the name.
+  herName: "Dinshi",
+
+  // Your name. Shown to her on the last screen: "letting Hritik know…".
+  yourName: "Hritik",
+
+  // Done — this is what emails her answer to hritik.shukla_pgprc6@mastersunion.org.
+  // It's a public key by design (Web3Forms' own words), safe in client-side code.
+  // Manage or replace it at https://app.web3forms.com
+  web3formsKey: "087cc5f6-b66e-4396-81e9-3747ce081f27",
+
+  // The activity options she picks from. Add/remove freely.
+  activities: [
+    "dinner somewhere nice 🍝",
+    "coffee and a long walk ☕",
+    "a long drive 🚗",
+    "a movie 🍿",
+    "something completely random ✨"
+  ],
+
+  // How far ahead she's allowed to pick, in days.
+  maxDaysAhead: 90,
+
+  // Labels the "no" button cycles through as it runs away.
+  noLabels: ["no","are you sure?","really?","think again","last chance","not an option 😌","the button is broken","just press yes 🙂"]
+};
+
+/* ═══════════════════════════════════════════════════════════
+   Nothing below here needs editing.
+   ═══════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+
+  const $  = (s) => document.querySelector(s);
+  const on = (el, ev, fn, opts) => el.addEventListener(ev, fn, opts);
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const state = { date: "", activity: "", note: "" };
+
+  /* ── screens ─────────────────────────────────────── */
+  function show(id) {
+    document.querySelectorAll(".screen").forEach((s) => s.classList.remove("on"));
+    $(id).classList.add("on");
+    window.scrollTo(0, 0);
+  }
+
+  /* ── personalise ─────────────────────────────────── */
+  if (CONFIG.herName) {
+    $("#ask-title").textContent = "will you go out with me, " + CONFIG.herName + "?";
+    $("#yay-sub").textContent   = "okay okay okay. let's plan this properly, " + CONFIG.herName + ".";
+  }
+
+  /* ══════════════════════════════════════════════════
+     CONFETTI
+     ══════════════════════════════════════════════════ */
+  const cv = $("#confetti");
+  const ctx = cv.getContext("2d");
+  let parts = [], raf = null, dpr = 1;
+
+  function sizeCanvas() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width  = innerWidth  * dpr;
+    cv.height = innerHeight * dpr;
+    cv.style.width  = innerWidth  + "px";
+    cv.style.height = innerHeight + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  sizeCanvas();
+  on(window, "resize", sizeCanvas);
+
+  const COLORS = ["#ff4f96","#ffc9de","#a855f7","#ffd166","#4cc9f0","#fff"];
+
+  function burst(count) {
+    if (reduced) return;
+    const cx = innerWidth / 2, cy = innerHeight * 0.42;
+    for (let i = 0; i < count; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 5 + Math.random() * 11;
+      parts.push({
+        x: cx + (Math.random() - .5) * 90,
+        y: cy + (Math.random() - .5) * 60,
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp - 6,
+        w: 6 + Math.random() * 7,
+        h: 9 + Math.random() * 9,
+        rot: Math.random() * 6.28,
+        vr: (Math.random() - .5) * .32,
+        col: COLORS[(Math.random() * COLORS.length) | 0],
+        life: 105 + Math.random() * 55
+      });
+    }
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter((p) => --p.life > 0 && p.y < innerHeight + 70);
+    for (const p of parts) {
+      p.vy += 0.32;          // gravity
+      p.vx *= 0.995;         // drag
+      p.x  += p.vx;
+      p.y  += p.vy;
+      p.rot += p.vr;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.min(1, p.life / 40);
+      ctx.fillStyle = p.col;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+    raf = parts.length ? requestAnimationFrame(tick) : (ctx.clearRect(0, 0, innerWidth, innerHeight), null);
+  }
+
+  /* ══════════════════════════════════════════════════
+     FLOATING HEARTS
+     ══════════════════════════════════════════════════ */
+  if (!reduced) {
+    const box = $("#hearts");
+    const glyphs = ["💗","💛","💜","🩷","✨"];
+    for (let i = 0; i < 14; i++) {
+      const h = document.createElement("i");
+      h.textContent = glyphs[(Math.random() * glyphs.length) | 0];
+      h.style.left = Math.random() * 100 + "%";
+      h.style.fontSize = 13 + Math.random() * 21 + "px";
+      h.style.animationDuration = 15 + Math.random() * 17 + "s";
+      h.style.animationDelay = -Math.random() * 30 + "s";
+      box.appendChild(h);
+    }
+  }
+
+  /* ══════════════════════════════════════════════════
+     SCREEN 1 — the ask, and the runaway "no"
+     ══════════════════════════════════════════════════ */
+  const yes = $("#yes"), no = $("#no");
+  let dodges = 0, lastDodge = -1e9;
+
+  function dodge(e) {
+    // Always kill the default first, so no stray click ever gets through.
+    if (e) e.preventDefault();
+
+    // A single finger tap on Android fires pointerdown + touchstart + a
+    // synthetic mouseenter + click. Without this guard one tap counts as
+    // four dodges and the button flickers across the screen.
+    const now = performance.now();
+    if (now - lastDodge < 250) return false;
+    lastDodge = now;
+
+    // On first dodge, freeze its size and cut it loose from the layout.
+    if (!no.classList.contains("loose")) {
+      const r = no.getBoundingClientRect();
+      // Deliberately NOT freezing width/height here. The labels get longer
+      // than the original "no", and a frozen width makes the text wrap and
+      // spill out of the pill. Let it resize to whatever the label needs.
+      no.style.left = r.left + "px";
+      no.style.top  = r.top  + "px";
+      no.classList.add("loose");
+      // The card has backdrop-filter on it, which makes it the containing
+      // block for fixed-position children — left/top would then be measured
+      // against the card, not the screen, and it'd wander off the edge.
+      // Reparenting to <body> makes "fixed" mean actually fixed.
+      document.body.appendChild(no);
+      void no.offsetWidth; // commit the start position before animating
+    }
+
+    dodges++;
+    no.textContent = CONFIG.noLabels[Math.min(dodges, CONFIG.noLabels.length - 1)];
+
+    const pad = 10;
+    const w = no.offsetWidth, h = no.offsetHeight;
+    const maxX = Math.max(pad, innerWidth  - w - pad);
+    const maxY = Math.max(pad, innerHeight - h - pad);
+    const safe = yes.getBoundingClientRect();
+
+    // Where her finger / cursor is right now, so we don't land under it.
+    const fx = (e && e.clientX) || -999;
+    const fy = (e && e.clientY) || -999;
+
+    // Try a few spots: not on the yes button, and not under her finger.
+    let x = pad, y = pad;
+    for (let i = 0; i < 20; i++) {
+      x = pad + Math.random() * (maxX - pad);
+      y = pad + Math.random() * (maxY - pad);
+      const offYes =
+        x + w < safe.left - 18 || x > safe.right + 18 ||
+        y + h < safe.top  - 18 || y > safe.bottom + 18;
+      const offFinger = Math.hypot(x + w / 2 - fx, y + h / 2 - fy) > 130;
+      if (offYes && offFinger) break;
+    }
+    no.style.left = x + "px";
+    no.style.top  = y + "px";
+
+    // ...and the yes button gets a little more inviting each time.
+    yes.style.transform = "scale(" + Math.min(1 + dodges * 0.085, 1.75) + ")";
+    return false;
+  }
+
+  // pointerdown fires before click, so it escapes the tap on Android too.
+  on(no, "pointerdown", dodge, { passive: false });
+  on(no, "touchstart",  dodge, { passive: false });
+  on(no, "mouseenter",  dodge);
+  on(no, "click",       dodge);
+  on(no, "focus", () => yes.focus()); // keyboard users can't trap it either
+
+  on(yes, "click", () => {
+    no.remove(); // it lives on <body> now, so it won't hide with the card
+    burst(150);
+    show("#s-yay");
+    setTimeout(() => burst(70), 380);
+  });
+
+  on($("#to-date"), "click", () => show("#s-date"));
+
+  /* ══════════════════════════════════════════════════
+     SCREEN 3 — date
+     ══════════════════════════════════════════════════ */
+  const dateIn = $("#date-in"), toAct = $("#to-act");
+
+  const iso = (d) =>
+    d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+
+  const today = new Date();
+  const last  = new Date();
+  last.setDate(last.getDate() + CONFIG.maxDaysAhead);
+  dateIn.min = iso(today);
+  dateIn.max = iso(last);
+
+  on(dateIn, "change", () => {
+    state.date = dateIn.value;
+    toAct.disabled = !state.date;
+  });
+  on(dateIn, "input", () => dateIn.dispatchEvent(new Event("change")));
+
+  on(toAct, "click", () => show("#s-act"));
+  on($("#back-date"), "click", () => show("#s-date"));
+
+  /* ══════════════════════════════════════════════════
+     SCREEN 4 — activity
+     ══════════════════════════════════════════════════ */
+  const opts = $("#opts"), toDone = $("#to-done"), noteIn = $("#note-in");
+
+  CONFIG.activities.forEach((label, i) => {
+    const l = document.createElement("label");
+    l.className = "opt";
+    l.innerHTML =
+      '<span class="dot"></span>' +
+      '<input type="radio" name="act" value="' + label.replace(/"/g, "&quot;") + '">' +
+      "<span>" + label + "</span>";
+    on(l, "click", () => {
+      opts.querySelectorAll(".opt").forEach((o) => o.classList.remove("sel"));
+      l.classList.add("sel");
+      state.activity = label;
+      toDone.disabled = false;
+    });
+    opts.appendChild(l);
+  });
+
+  on(toDone, "click", async () => {
+    state.note = noteIn.value.trim();
+    toDone.disabled = true;
+
+    const when = prettyDate(state.date);
+    render(when);
+    show("#s-done");
+    burst(190);
+
+    // She's already seeing the happy ending; the send happens behind it.
+    if (await sendIt(when)) {
+      $("#status").className = "hint ok";
+      $("#status").textContent = heHas + " 💛 nothing else for you to do.";
+    } else {
+      $("#status").hidden = true;
+      $("#rescue-text").textContent = messageText(when);
+      $("#rescue").hidden = false;
+    }
+  });
+
+  /* ══════════════════════════════════════════════════
+     SCREEN 5 — summary, silent send, rescue fallback
+     ══════════════════════════════════════════════════ */
+  // "letting Hritik know…" / "letting him know…"  — and  "Hritik has it" / "he has it"
+  const him   = CONFIG.yourName || "him";
+  const heHas = CONFIG.yourName ? CONFIG.yourName + " has it" : "he has it";
+  $("#status").lastChild.textContent = "letting " + him + " know…";
+
+  function prettyDate(v) {
+    const [y, m, d] = v.split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+      weekday: "long", day: "numeric", month: "long"
+    });
+  }
+
+  function render(when) {
+    $("#r-date").textContent = when;
+    $("#r-act").textContent  = state.activity;
+    if (state.note) {
+      $("#r-note").textContent = state.note;
+      $("#r-note-row").hidden = false;
+    }
+  }
+
+  // What she'd copy across manually if the network failed her.
+  function messageText(when) {
+    const lines = ["it's a yes 💛", "", "📅 " + when, "✨ " + state.activity];
+    if (state.note) lines.push("📝 " + state.note);
+    return lines.join("\n");
+  }
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // Three attempts with a widening gap, then we give up and let her help.
+  async function sendIt(when) {
+    if (!CONFIG.web3formsKey) {
+      console.warn("[date-invite] CONFIG.web3formsKey is empty — nothing was sent.");
+      return false;
+    }
+
+    const payload = {
+      access_key: CONFIG.web3formsKey,
+      subject: (CONFIG.herName || "she") + " said yes 💛",
+      from_name: "your little website",
+      botcheck: "",
+      Answer:    "YES",
+      When:      when,
+      What:      state.activity,
+      Note:      state.note || "—",
+      Submitted: new Date().toLocaleString()
+    };
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success) return true;
+        console.warn("[date-invite] attempt " + attempt + " rejected:", data.message || res.status);
+      } catch (err) {
+        console.warn("[date-invite] attempt " + attempt + " failed:", err.message);
+      }
+      if (attempt < 3) await sleep(attempt * 1500);
+    }
+    return false;
+  }
+
+  on($("#copy"), "click", async () => {
+    const btn = $("#copy"), text = $("#rescue-text").textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (_) {
+      // Older Android browsers, or a page not served over https.
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    btn.textContent = "copied ✓";
+    setTimeout(() => (btn.textContent = "copy it 📋"), 2200);
+  });
+})();
+</script>
+</body>
+</html>
